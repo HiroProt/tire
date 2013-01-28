@@ -93,19 +93,17 @@ module Tire
           version = options.delete(:version)
           s.version(version) if version
 
-          if block_given?
-            block.arity < 1 ? s.instance_eval(&block) : block.call(s)
-          else
-            if query.is_a? Hash
-              s.query query
+          unless options[:payload]
+            if block_given?
+              block.arity < 1 ? s.instance_eval(&block) : block.call(s)
             else
               s.query { string query }
+              # TODO: Actualy, allow passing all the valid options from
+              # <http://www.elasticsearch.org/guide/reference/api/search/uri-request.html>
+              s.fields Array(options[:fields]) if options[:fields]
             end
-            # TODO: Actualy, allow passing all the valid options from
-            # <http://www.elasticsearch.org/guide/reference/api/search/uri-request.html>
-            s.fields Array(options[:fields]) if options[:fields]
           end
-
+          
           s.results
         end
 
